@@ -7,6 +7,129 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!--
+    HEADER
+    - App title
+    - Counter badge with separate spans for easy JS updates
+    -->
+    <header>
+      <h1>QuickTasks</h1>
+      <div id="counter-badge">
+        <!-- JS will set these numbers on each add/done/delete -->
+        <span id="total-count">0</span> tasks |
+        <span id="done-count">0</span> done
+      </div>
+    </header>
+
+    <!--
+    FLASH / STATUS MESSAGES
+    - Hidden by default; shown briefly after actions (e.g., "Task added!")
+    -->
+    <div id="flash" hidden role="status"></div>
+
+    <!--
+    ADD TASK FORM
+    - Each control has an id so JS can cache it easily
+    - HTML validation via required/minlength/min attributes
+    - The <small.error> directly follows the name input so we can reach it via nextElementSibling
+    -->
+    <form id="task-form">
+      <!-- Task name (required, at least 3 chars) -->
+      <label for="task-name">Task Name</label>
+      <input
+        type="text"
+        id="task-name"
+        name="task-name"
+        required
+        minlength="3"
+        placeholder="e.g., Write report"
+      />
+      <!-- Inline validation message area (initially empty/hidden via CSS) -->
+      <small class="error"></small>
+
+      <!-- Category (required) -->
+      <label for="task-category">Category</label>
+      <select name="category" id="task-category" required>
+        <option value="" disabled selected>Select…</option>
+        <option value="Work">Work</option>
+        <option value="Personal">Personal</option>
+        <option value="School">School</option>
+      </select>
+
+      <!-- Priority radios share the same "name" so only one can be selected -->
+      <fieldset>
+        <legend>Priority</legend>
+        <!-- Provide values + ids so labels are clickable -->
+        <label for="p-low"
+          ><input
+            type="radio"
+            id="p-low"
+            name="priority"
+            value="Low"
+          />Low</label
+        >
+        <label for="p-med"
+          ><input
+            type="radio"
+            id="p-med"
+            name="priority"
+            value="Med"
+            checked
+          />Med</label
+        >
+        <label for="p-high"
+          ><input
+            type="radio"
+            id="p-high"
+            name="priority"
+            value="High"
+          />High</label
+        >
+      </fieldset>
+
+      <!-- Due date with a minimum (today). -->
+      <label for="task-due">Due date</label>
+      <input type="date" id="task-due" name="task-due" min="2025-08-15" />
+
+      <!-- Submit button (toggle disabled/enabled via JS during validation) -->
+      <button id="add-btn" type="submit">Add Task</button>
+    </form>
+
+    <!--
+    FILTER CONTROL
+    - JS will iterate tasks and show/hide based on this value
+    -->
+    <label for="filter">Filter</label>
+    <select id="filter">
+      <option value="All">All</option>
+      <option value="Work">Work</option>
+      <option value="Personal">Personal</option>
+      <option value="School">School</option>
+    </select>
+
+    <!--
+    TASK LIST
+    - Tasks render here as <li class="task"> elements
+    -->
+    <ul id="task-list"></ul>
+
+    <!--
+    TEMPLATE FOR A SINGLE TASK
+    - Cloned via JS (cloneNode) to render tasks
+    - data-category help with filtering and accessibility
+    - Buttons are type="button" to prevent accidental form submits
+    -->
+    <template id="task-template">
+      <li class="task" data-category="" title="">
+        <span class="title"></span>
+        <span class="badge category"></span>
+        <span class="badge priority"></span>
+        <span class="due"></span>
+        <button class="btn-done" type="button">Done</button>
+        <button class="btn-delete" type="button">Delete</button>
+      </li>
+    </template>
+
     <script src="script.js"></script>
   </body>
 </html>
