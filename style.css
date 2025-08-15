@@ -1,0 +1,310 @@
+/* =========================
+   Global / Reset
+   ========================= */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #fdf0d5;
+  --red: #c1121f;
+  --txt-color: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.4;
+}
+
+ul {
+  list-style: none;
+}
+
+label {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--bg-color);
+}
+
+button {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+input {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+input:focus {
+  outline: none;
+}
+
+select {
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+select:focus {
+  outline: none;
+}
+
+/* =========================
+   Layout
+   ========================= */
+.container {
+  width: 720px;
+  max-width: 100%;
+  margin: 0 auto;
+  background-color: var(--red);
+  min-height: 100vh;
+  padding: 30px 20px 40px;
+}
+
+header {
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--bg-color);
+}
+
+header div {
+  background-color: #780000;
+  font-size: 25px;
+  text-transform: capitalize;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+/* Counter badge fine-tuning */
+#counter-badge {
+  display: inline-block;
+  line-height: 1;
+}
+#counter-badge span {
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================
+   Flash / Status banner
+   ========================= */
+#flash[hidden] {
+  display: none !important;
+}
+#flash {
+  background: #e9edc9;
+  color: #283618;
+  border: 1px solid #ccd5ae;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 16px 0 20px;
+  font-weight: 600;
+}
+
+/* =========================
+   Form
+   ========================= */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #780000;
+  padding: 20px;
+  border-radius: 10px;
+  color: var(--bg-color);
+  margin-bottom: 20px;
+}
+
+form label {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+form small {
+  display: none;
+}
+
+form input,
+form select,
+form button {
+  width: 100%;
+}
+
+form fieldset {
+  padding: 10px 0;
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+}
+
+form fieldset legend {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+form fieldset label {
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+form button {
+  width: fit-content;
+  margin: 6px auto 0;
+  background-color: var(--txt-color);
+}
+
+/* Submit button state */
+#add-btn {
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#add-btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Inline error helper */
+.error {
+  display: none; /* hidden by default */
+  color: #ffd7d7;
+  font-size: 0.85rem;
+  margin-top: -6px;
+  margin-bottom: 6px;
+}
+.error-visible {
+  display: block; /* toggle this via JS to show */
+}
+
+/* =========================
+   Filter controls
+   ========================= */
+label[for="filter"] {
+  display: inline-block;
+  margin-top: 8px;
+  margin-right: 8px;
+  color: var(--bg-color);
+}
+
+#filter {
+  min-width: 160px;
+  margin-top: 8px;
+}
+
+/* =========================
+   Task list & items
+   ========================= */
+#task-list {
+  margin-top: 10px;
+}
+
+ul .task {
+  background-color: var(--bg-color);
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* Content flow inside a task */
+.task .title {
+  flex: 1;
+  font-weight: 700;
+  color: #1f1f1f;
+}
+
+.task .due {
+  margin-left: auto; /* push right if space allows */
+  font-size: 0.9rem;
+  color: #333333;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  color: #222222;
+}
+
+.badge.category {
+  background: #f7d9d9; /* soft category chip */
+}
+
+.badge.priority {
+  background: #d8e2dc; /* neutral priority chip */
+}
+
+/* (Optional) minor visual tweak for priority */
+.badge.priority::before {
+  content: "• ";
+}
+
+/* Buttons inside tasks */
+.btn-done,
+.btn-delete {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 700;
+  margin-left: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn-done {
+  background: #e1f5e0;
+  color: #144d12;
+  border-color: #bfe5bd;
+}
+
+.btn-delete {
+  background: #ffe5e5;
+  color: #7a0b0b;
+  border-color: #f5bcbc;
+}
+
+.btn-done:hover,
+.btn-delete:hover {
+  filter: brightness(0.98);
+}
+
+/* States */
+.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+.overdue {
+  color: #9b2226;
+  font-weight: 700;
+}
+
+/* Empty-state helper (you'll create/update this via JS) */
+.muted {
+  color: #f1d7c0;
+  font-style: italic;
+  text-align: center;
+  margin-top: 16px;
+}
