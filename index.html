@@ -46,7 +46,7 @@
           placeholder="e.g., Write report"
         />
         <!-- Inline validation message area (initially empty/hidden via CSS) -->
-        <small class="error"></small>
+        <small class="error">hello</small>
 
         <!-- Category (required) -->
         <label for="task-category">Category</label>
@@ -105,16 +105,7 @@
     TASK LIST
     - Tasks render here as <li class="task"> elements
     -->
-      <ul id="task-list">
-        <li class="task" data-category="" title="">
-          <span class="title">hello</span>
-          <span class="badge category">hello</span>
-          <span class="badge priority">hello</span>
-          <span class="due">hello</span>
-          <button class="btn-done" type="button">Done</button>
-          <button class="btn-delete" type="button">Delete</button>
-        </li>
-      </ul>
+      <ul id="task-list"></ul>
 
       <!--
     TEMPLATE FOR A SINGLE TASK

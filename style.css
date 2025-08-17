@@ -125,28 +125,16 @@ form {
   margin-bottom: 20px;
 }
 
-form label {
-  font-size: 18px;
-  font-weight: bold;
-}
-
 form small {
   display: none;
-}
-
-form input,
-form select,
-form button {
-  width: 100%;
 }
 
 form fieldset {
   padding: 10px 0;
   border: none;
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px 20px;
   align-items: center;
+  justify-content: space-evenly;
 }
 
 form fieldset legend {
@@ -232,7 +220,7 @@ ul .task {
 }
 
 .task .due {
-  margin-left: auto; /* push right if space allows */
+  margin-left: auto;
   font-size: 0.9rem;
   color: #333333;
 }
@@ -250,14 +238,13 @@ ul .task {
 }
 
 .badge.category {
-  background: #f7d9d9; /* soft category chip */
+  background: #f7d9d9; 
 }
 
 .badge.priority {
-  background: #d8e2dc; /* neutral priority chip */
+  background: #d8e2dc; 
 }
 
-/* (Optional) minor visual tweak for priority */
 .badge.priority::before {
   content: "• ";
 }
@@ -301,7 +288,7 @@ ul .task {
   font-weight: 700;
 }
 
-/* Empty-state helper (you'll create/update this via JS) */
+/* Empty-state helper (create/update this via JS) */
 .muted {
   color: #f1d7c0;
   font-style: italic;
