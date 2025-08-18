@@ -167,14 +167,14 @@ form button {
 
 /* Inline error helper */
 .error {
-  display: none; /* hidden by default */
+  display: none;
   color: #ffd7d7;
   font-size: 0.85rem;
   margin-top: -6px;
   margin-bottom: 6px;
 }
 .error-visible {
-  display: block; /* toggle this via JS to show */
+  display: block;
 }
 
 /* =========================
@@ -238,11 +238,11 @@ ul .task {
 }
 
 .badge.category {
-  background: #f7d9d9; 
+  background: #f7d9d9;
 }
 
 .badge.priority {
-  background: #d8e2dc; 
+  background: #d8e2dc;
 }
 
 .badge.priority::before {
