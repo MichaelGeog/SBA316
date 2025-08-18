@@ -126,6 +126,53 @@ function setCompletedState(li, completed) {
   updateCounter();
 }
 
+function applyFilter() {
+  const selected = filter.value; // "All" | "Work" | "Personal" | "School"
+  const items = taskList.querySelectorAll("li.task"); // NodeList (iterable)
+
+  for (const li of items) {
+    const cat = li.getAttribute("data-category") || "";
+    // Show all if "All" is chosen, otherwise match exact category
+    const shouldShow = selected === "All" || cat === selected;
+
+    // Toggle visibility (clear inline style to fall back to CSS 'flex')
+    li.style.display = shouldShow ? "" : "none";
+  }
+}
+
+// Re-apply the current filter after adding a task so it respects the selection
+function addTaskReapplyFilter() {
+  applyFilter();
+}
+
+// Delegated click on the list — Done / Delete actions
+taskList.addEventListener("click", (event) => {
+  const btn = event.target.closest("button");
+  if (!btn) return; // not a button click; ignore
+
+  // Explicit parent navigation (rubric): buttons are direct children of <li.task>
+  const li = btn.parentNode;
+  if (!li || !li.classList || !li.classList.contains("task")) return;
+
+  if (btn.classList.contains("btn-delete")) {
+    // BOM confirm before deleting
+    const ok = confirm("Delete this task?");
+    if (!ok) return;
+
+    li.remove(); // remove the task
+    updateCounter(); // keep badge accurate
+    ensureEmptyState(); // show empty message if list is now empty
+    showFlash("Task deleted");
+    return;
+  }
+
+  if (btn.classList.contains("btn-done")) {
+    const completed = li.classList.contains("completed");
+    setCompletedState(li, !completed); // toggles class, aria, button label, counter
+    showFlash(!completed ? "Task completed" : "Task restored");
+  }
+});
+
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -177,6 +224,8 @@ taskForm.addEventListener("submit", (event) => {
 
   ensureEmptyState();
 
+  addTaskReapplyFilter();
+
   // 7) Reset form and validation state
   taskForm.reset();
   const med = document.getElementById("p-med");
@@ -185,6 +234,6 @@ taskForm.addEventListener("submit", (event) => {
 });
 
 // Fix the filter listener (just a placeholder for now; real filtering in Step 10)
-filter.addEventListener("change", (event) => {
-  console.log("filter change:", event.target.value);
+filter.addEventListener("change", () => {
+  applyFilter();
 });
