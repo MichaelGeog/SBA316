@@ -1,50 +1,109 @@
-// === Cache (getElementById) ===
+// getElementById usage
 const taskForm = document.getElementById("task-form");
 const taskName = document.getElementById("task-name");
 const taskCategory = document.getElementById("task-category");
 const taskDue = document.getElementById("task-due");
 const addBtn = document.getElementById("add-btn");
 const taskList = document.getElementById("task-list");
-
 const counterBadge = document.getElementById("counter-badge");
-const totalCount = document.getElementById("total-count"); // NEW
-const doneCount = document.getElementById("done-count"); // NEW
-
+const totalCount = document.getElementById("total-count");
+const doneCount = document.getElementById("done-count");
 const flash = document.getElementById("flash");
 const filter = document.getElementById("filter");
 
-// === Cache (querySelector / querySelectorAll) ===
-const taskTemplate = document.querySelector("#task-template"); // template element
+// querySelector / querySelectorAll usage
+const taskTemplate = document.querySelector("#task-template");
 const priorityRadios = document.querySelectorAll('input[name="priority"]');
 
-// === Cache (nextElementSibling) which is the error because its after #task-name
+// sibling navigation (error is the *next* element after #task-name)
 const nameError = taskName.nextElementSibling;
 
-(function setMinDate() {
+// Keep date min at today  (also demonstrates attribute modification)
+function setMinDateToday() {
   const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const iso = `${yyyy}-${mm}-${dd}`;
-  if (taskDue) taskDue.min = iso;
-})();
+  const date = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(d.getDate()).padStart(2, "0")}`;
+  if (taskDue) taskDue.min = date;
+}
 
+// Get selected priority
+function getCheckedPriority() {
+  const el = document.querySelector('input[name="priority"]:checked');
+  return el ? el.value : null;
+}
+
+// Flash helper (uses setTimeout from BOM)
+function showFlash(message, ms = 1500) {
+  flash.textContent = message;
+  flash.hidden = false;
+  setTimeout(() => {
+    flash.hidden = true;
+    flash.textContent = "";
+  }, ms);
+}
+
+// Counter badge updater (modifies text content)
+function updateCounter() {
+  const total = taskList.querySelectorAll("li.task").length;
+  const done = taskList.querySelectorAll("li.task.completed").length;
+  totalCount.textContent = String(total);
+  doneCount.textContent = String(done);
+}
+
+// Empty state creator (uses createElement and append/remove)
+function ensureEmptyState() {
+  const hasTasks = !!taskList.querySelector("li.task");
+  let emptyStateEl = taskList.querySelector("#empty-state");
+
+  if (!hasTasks) {
+    if (!emptyStateEl) {
+      emptyStateEl = document.createElement("li");
+      emptyStateEl.id = "empty-state";
+      emptyStateEl.className = "muted";
+      emptyStateEl.textContent = "You have no tasks yet.";
+      //appendChild / prepend (append here)
+      taskList.appendChild(emptyStateEl);
+    }
+  } else {
+    if (emptyStateEl) emptyStateEl.remove();
+  }
+}
+
+// Completed state toggler (class + attribute + button label)
+function setCompletedState(li, completed) {
+  if (!li || !li.classList || !li.classList.contains("task")) return;
+  li.classList.toggle("completed", Boolean(completed));
+  const btn = li.querySelector(".btn-done");
+  if (btn) btn.textContent = completed ? "Undo" : "Done";
+  updateCounter();
+}
+
+// Category filter (iterate over a NodeList, toggle visibility)
+function applyFilter() {
+  const selected = filter.value; // "All" | "Work" | "Personal" | "School"
+  const items = taskList.querySelectorAll("li.task");
+
+  for (const li of items) {
+    const cat = li.getAttribute("data-category") || "";
+    const shouldShow = selected === "All" || cat === selected;
+    li.style.display = shouldShow ? "" : "none";
+  }
+}
+
+// Validation (DOM event-based; toggles error visibility and button disabled)
 function updateNameValidity() {
   const value = taskName.value.trim();
   const hasText = value.length > 0;
   const isValid = value.length >= 3; // mirrors minlength="3"
 
-  // Button state: enabled only when valid
   if (isValid) {
     addBtn.removeAttribute("disabled");
   } else {
     addBtn.setAttribute("disabled", "");
   }
 
-  // Error visibility:
-  // - Empty field => hide error (no nagging)
-  // - Has text but <3 chars => show error
-  // - Valid => hide error
   if (!hasText) {
     nameError.textContent = "";
     nameError.classList.remove("error-visible");
@@ -57,183 +116,110 @@ function updateNameValidity() {
   }
 }
 
-taskName.addEventListener("input", updateNameValidity);
-
-updateNameValidity();
-
-function getCheckedPriority() {
-  const el = document.querySelector('input[name="priority"]:checked');
-  return el ? el.value : null;
-}
-
-function updateCounter() {
-  const total = taskList.querySelectorAll("li.task").length;
-  const done = taskList.querySelectorAll("li.task.completed").length;
-  totalCount.textContent = String(total);
-  doneCount.textContent = String(done);
-}
-
-function showFlash(message, ms = 1500) {
-  flash.textContent = message;
-  flash.hidden = false;
-  setTimeout(() => {
-    flash.hidden = true;
-    flash.textContent = "";
-  }, ms);
-}
-
-let emptyStateEl = null;
-
-function ensureEmptyState() {
-  const hasTasks = !!taskList.querySelector("li.task");
-
-  // Create the element once
-  if (!emptyStateEl) {
-    emptyStateEl = document.createElement("li"); // keep it inside the <ul>
-    emptyStateEl.id = "empty-state";
-    emptyStateEl.className = "muted";
-    emptyStateEl.textContent = "You have no tasks yet.";
-  }
-
-  if (!hasTasks) {
-    // Show it if it's not in the DOM
-    if (!taskList.querySelector("#empty-state")) {
-      taskList.appendChild(emptyStateEl);
-    }
-  } else {
-    // Remove it if tasks exist
-    const existing = taskList.querySelector("#empty-state");
-    if (existing) existing.remove();
-  }
-}
-
-ensureEmptyState();
-
-function setCompletedState(li, completed) {
-  if (!li || !li.classList || !li.classList.contains("task")) return;
-
-  // 1) Visual state
-  li.classList.toggle("completed", Boolean(completed));
-
-  // 2) Accessibility/state attribute (optional but nice)
-  li.setAttribute("aria-checked", completed ? "true" : "false");
-
-  // 3) Button label swap
-  const btn = li.querySelector(".btn-done");
-  if (btn) btn.textContent = completed ? "Undo" : "Done";
-
-  // 4) Recompute counters
-  updateCounter();
-}
-
-function applyFilter() {
-  const selected = filter.value; // "All" | "Work" | "Personal" | "School"
-  const items = taskList.querySelectorAll("li.task"); // NodeList (iterable)
-
-  for (const li of items) {
-    const cat = li.getAttribute("data-category") || "";
-    // Show all if "All" is chosen, otherwise match exact category
-    const shouldShow = selected === "All" || cat === selected;
-
-    // Toggle visibility (clear inline style to fall back to CSS 'flex')
-    li.style.display = shouldShow ? "" : "none";
-  }
-}
-
-// Re-apply the current filter after adding a task so it respects the selection
-function addTaskReapplyFilter() {
-  applyFilter();
-}
-
-// Delegated click on the list — Done / Delete actions
-taskList.addEventListener("click", (event) => {
-  const btn = event.target.closest("button");
-  if (!btn) return; // not a button click; ignore
-
-  // Explicit parent navigation (rubric): buttons are direct children of <li.task>
-  const li = btn.parentNode;
-  if (!li || !li.classList || !li.classList.contains("task")) return;
-
-  if (btn.classList.contains("btn-delete")) {
-    // BOM confirm before deleting
-    const ok = confirm("Delete this task?");
-    if (!ok) return;
-
-    li.remove(); // remove the task
-    updateCounter(); // keep badge accurate
-    ensureEmptyState(); // show empty message if list is now empty
-    showFlash("Task deleted");
-    return;
-  }
-
-  if (btn.classList.contains("btn-done")) {
-    const completed = li.classList.contains("completed");
-    setCompletedState(li, !completed); // toggles class, aria, button label, counter
-    showFlash(!completed ? "Task completed" : "Task restored");
-  }
-});
-
+// Form submit → add task (clone template, prepend, flash, reset, counters)
 taskForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  // re-check name validity; if invalid, stop
+  // Re-check validity; block if invalid
   updateNameValidity();
   if (addBtn.hasAttribute("disabled")) {
     console.log("submit blocked: name invalid");
     return;
   }
 
-  // 1) Collect values
+  if (
+    typeof taskForm.reportValidity === "function" &&
+    !taskForm.reportValidity()
+  ) {
+    return;
+  }
+
+  // Collect values
   const name = taskName.value.trim();
   const category = taskCategory.value;
   const priority = getCheckedPriority() || "Med";
-  const due = taskDue.value; // may be ""
+  const due = taskDue.value;
 
-  // 2) Clone template and get the <li>
+  // Clone from template
   const frag = taskTemplate.content.cloneNode(true);
   const newTask = frag.querySelector(".task");
 
-  // 3) Fill text
-  frag.querySelector(".title").textContent = name;
-  frag.querySelector(".badge.category").textContent = category;
-  frag.querySelector(".badge.priority").textContent = priority;
+  // Fill text
+  frag.querySelector(".title").textContent = name; // [R8]
+  frag.querySelector(".badge.category").textContent = category; // [R8]
+  frag.querySelector(".badge.priority").textContent = priority; // [R8]
 
   const dueSpan = frag.querySelector(".due");
   if (due) {
-    dueSpan.textContent = `Due: ${due}`;
-    // overdue check: ISO yyyy-mm-dd string compare is fine vs today's min
+    dueSpan.textContent = `Due: ${due}`; // [R8]
+    // Overdue if due < today (string compare ok for ISO yyyy-mm-dd)
     if (taskDue.min && due < taskDue.min) {
-      dueSpan.classList.add("overdue");
+      dueSpan.classList.add("overdue"); // [R9]
     }
   } else {
-    dueSpan.textContent = ""; // no due date shown
+    dueSpan.textContent = "";
   }
 
-  // 4) Attributes for filtering / tooltip
-  newTask.setAttribute("data-category", category);
-  newTask.setAttribute("title", `${priority} priority`);
+  // Attributes for filtering / tooltip
+  newTask.setAttribute("data-category", category); // [R10]
+  newTask.setAttribute("title", `${priority} priority`); // [R10]
+  newTask.setAttribute("aria-checked", "false"); // [R10]
 
-  setCompletedState(newTask, false);
-
-  // 5) Insert at top
+  // Insert at top
   taskList.prepend(newTask);
 
-  // 6) Flash + Counter
-  showFlash("Task added!");
-  updateCounter();
+  // Initialize completed state explicitly (keeps label correct)
+  setCompletedState(newTask, false);
 
+  // Flash + counter + empty-state + respect current filter
+  showFlash("Task added!"); // [R12]
+  updateCounter(); // [R8]
   ensureEmptyState();
+  applyFilter();
 
-  addTaskReapplyFilter();
-
-  // 7) Reset form and validation state
+  // Reset form and validation state
   taskForm.reset();
   const med = document.getElementById("p-med");
   if (med) med.checked = true;
   updateNameValidity();
 });
 
-// Fix the filter listener (just a placeholder for now; real filtering in Step 10)
+// Delegated Done/Delete actions (parentNode navigation + confirm)
+taskList.addEventListener("click", (event) => {
+  const btn = event.target.closest("button");
+  if (!btn) return;
+
+  // explicit parent navigation
+  const li = btn.parentNode;
+  if (!li || !li.classList || !li.classList.contains("task")) return;
+
+  if (btn.classList.contains("btn-delete")) {
+    const ok = confirm("Delete this task?"); // [R12]
+    if (!ok) return;
+    li.remove();
+    updateCounter();
+    ensureEmptyState();
+    showFlash("Task deleted");
+    return;
+  }
+
+  if (btn.classList.contains("btn-done")) {
+    const completed = li.classList.contains("completed");
+    setCompletedState(li, !completed); // toggles class/aria/label + counter
+    showFlash(!completed ? "Task completed" : "Task restored");
+  }
+});
+
+// Filter change → iterate and show/hide
 filter.addEventListener("change", () => {
   applyFilter();
 });
+
+// Name input → live validation
+taskName.addEventListener("input", updateNameValidity);
+
+setMinDateToday(); // sets date min to today
+updateNameValidity(); // starts with button disabled + error hidden
+ensureEmptyState(); // show empty message initially
+applyFilter(); // respect current filter (defaults to All)
+updateCounter(); // initialize counter
